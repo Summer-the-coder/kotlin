@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.commonizer.CommonizerOutputFileLayout
 import org.jetbrains.kotlin.commonizer.SharedCommonizerTarget
 import org.jetbrains.kotlin.commonizer.konanTargets
 import org.jetbrains.kotlin.compilerRunner.maybeCreateCommonizerClasspathConfiguration
+import org.jetbrains.kotlin.gradle.dsl.multiplatformExtensionOrNull
 import org.jetbrains.kotlin.gradle.internal.isInIdeaSync
 import org.jetbrains.kotlin.gradle.internal.properties.nativeProperties
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle
@@ -27,6 +28,8 @@ import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPro
 import org.jetbrains.kotlin.gradle.plugin.await
 import org.jetbrains.kotlin.gradle.plugin.ide.Idea222Api
 import org.jetbrains.kotlin.gradle.plugin.ide.ideaImportDependsOn
+import org.jetbrains.kotlin.gradle.plugin.launch
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeBundleArtifactFormat
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeBundleArtifactFormat.addKotlinNativeBundleConfiguration
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeBundleBuildService
@@ -82,8 +85,33 @@ internal val Project.runCommonizerTask: TaskProvider<Task>
 
 private const val commonizeCInteropTaskName = "commonizeCInterop"
 
+internal fun Project.nativeDownloadTask(): TaskProvider<KotlinNativeDownloadTask> {
+    return locateOrRegisterTask<KotlinNativeDownloadTask>(
+        "kotlinNativeDownload",
+        configureTask = {
+            launch {
+                val targets = multiplatformExtensionOrNull?.awaitTargets()?.toSet().orEmpty()
+                kotlinNativeProvider.set(
+                    KotlinNativeFromToolchainProvider(
+                        project,
+                        targets.filterIsInstance<KotlinNativeTarget>().map { it.konanTarget }.toSet(),
+                        kotlinNativeBundleBuildService,
+                        true
+                    )
+                )
+                val koanDir = kotlinNativeProvider.flatMap { (it as KotlinNativeFromToolchainProvider).actualNativeHomeDirectory }
+                konanHome.set(koanDir.get())
+                nativeDirectoryLocation.set(layout.buildDirectory.file("konan.txt"))
+            }
+        }
+    )
+
+}
+
 internal suspend fun Project.commonizeCInteropTask(): TaskProvider<CInteropCommonizerTask>? {
     if (cInteropCommonizationEnabled()) {
+        val nativeDownloadTask = nativeDownloadTask()
+
         return locateOrRegisterTask(
             commonizeCInteropTaskName,
             invokeWhenRegistered = {
@@ -102,6 +130,7 @@ internal suspend fun Project.commonizeCInteropTask(): TaskProvider<CInteropCommo
                 kotlinCompilerArgumentsLogLevel
                     .value(project.kotlinPropertiesProvider.kotlinCompilerArgumentsLogLevel)
                     .finalizeValueOnRead()
+                dependsOn(nativeDownloadTask)
             }
         )
     }
@@ -143,9 +172,6 @@ private fun getCommonizedPlatformLibrariesFor(commonizerFile: File, target: Shar
     val targetOutputDirectory = CommonizerOutputFileLayout.resolveCommonizedDirectory(rootOutputDirectory, target)
     return targetOutputDirectory.listLibraryFiles()
 }
-
-private fun File.listLibraryFiles(): List<File> = listFiles().orEmpty()
-    .filter { it.isDirectory || it.extension == "klib" }
 
 private val Project.addCommonizerTaskToProject
     get() = if (kotlinPropertiesProvider.kotlinKmpProjectIsolationEnabled) {
