@@ -524,7 +524,10 @@ KaNamedFunctionSymbol:
   deprecationStatus: null
 
 KaNamedFunctionSymbol:
-  annotations: []
+  annotations: [
+    kotlin/internal/IntrinsicConstEvaluation()
+      psi: null
+  ]
   callableId: kotlin/Int.dec
   compilerVisibility: Public
   contextParameters: []
@@ -1091,7 +1094,10 @@ KaNamedFunctionSymbol:
   deprecationStatus: null
 
 KaNamedFunctionSymbol:
-  annotations: []
+  annotations: [
+    kotlin/internal/IntrinsicConstEvaluation()
+      psi: null
+  ]
   callableId: kotlin/Int.inc
   compilerVisibility: Public
   contextParameters: []
