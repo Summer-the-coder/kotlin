@@ -64,6 +64,10 @@ class FirCallCompleter(
 
     val completer: ConstraintSystemCompleter = ConstraintSystemCompleter(components)
 
+    fun isInsideAnnotationContext(): Boolean {
+        return transformer.expressionsTransformer?.enableArrayOfCallTransformation == true
+    }
+
     fun <T> completeCall(
         call: T,
         resolutionMode: ResolutionMode,
@@ -339,6 +343,7 @@ class FirCallCompleter(
             components.samResolver,
             components.context,
             mode,
+            insideAnnotationContext = isInsideAnnotationContext(),
         )
     }
 
