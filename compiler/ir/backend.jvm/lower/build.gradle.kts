@@ -9,13 +9,13 @@ dependencies {
     api(project(":compiler:ir.inline"))
     api(project(":compiler:backend.jvm"))
     compileOnly(intellijCore())
+
+    testImplementation(kotlinTest("junit"))
 }
 
 optInToUnsafeDuringIrConstructionAPI()
 
 sourceSets {
-    "main" {
-        projectDefault()
-    }
-    "test" {}
+    "main" { projectDefault() }
+    "test" { projectDefault() }
 }
