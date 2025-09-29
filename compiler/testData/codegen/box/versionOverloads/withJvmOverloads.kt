@@ -37,6 +37,12 @@ fun bar(
     @IntroducedAt("4") c: String = ""
 ) {}
 
+class ConflictingOverloads {
+    @JvmOverloads @Suppress("CONFLICT_WITH_JVM_OVERLOADS_ANNOTATION")
+    fun f(s: String, @IntroducedAt("1") x: Int = 0, @IntroducedAt("1") y: Long = 0L) {}
+    fun f(a: Any, b: Boolean) {}
+}
+
 fun test1(): String {
     val c = C()
     val foo0 = C::class.java.getMethod("foo")

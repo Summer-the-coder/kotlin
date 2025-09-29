@@ -63154,6 +63154,12 @@ public class IrJsES6CodegenBoxTestGenerated extends AbstractIrJsES6CodegenBoxTes
     }
 
     @Test
+    @TestMetadata("innerClass.kt")
+    public void testInnerClass() {
+      runTest("compiler/testData/codegen/box/versionOverloads/innerClass.kt");
+    }
+
+    @Test
     @TestMetadata("internal.kt")
     public void testInternal() {
       runTest("compiler/testData/codegen/box/versionOverloads/internal.kt");

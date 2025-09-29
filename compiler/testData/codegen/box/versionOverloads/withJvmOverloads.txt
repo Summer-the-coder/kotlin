@@ -27,6 +27,17 @@ public final class C {
 }
 
 @kotlin.Metadata
+public final class ConflictingOverloads {
+    // source: 'withJvmOverloads.kt'
+    public method <init>(): void
+    public synthetic static method f$default(p0: ConflictingOverloads, p1: java.lang.String, p2: int, p3: long, p4: int, p5: java.lang.Object): void
+    public final method f(@org.jetbrains.annotations.NotNull p0: java.lang.Object, p1: boolean): void
+    public final @kotlin.jvm.JvmOverloads method f(@org.jetbrains.annotations.NotNull p0: java.lang.String, @kotlin.IntroducedAt(version="1") p1: int): void
+    public final @kotlin.jvm.JvmOverloads method f(@org.jetbrains.annotations.NotNull p0: java.lang.String, @kotlin.IntroducedAt(version="1") p1: int, @kotlin.IntroducedAt(version="1") p2: long): void
+    public synthetic deprecated final @kotlin.Deprecated(message="This method is kept for binary compatibility purposes, please use the main overload. This overload corresponds to the initial version.", level=HIDDEN) method f(p0: java.lang.String): void
+}
+
+@kotlin.Metadata
 public final class WithJvmOverloadsKt {
     // source: 'withJvmOverloads.kt'
     public synthetic deprecated static method bar$default(p0: int, p1: int, p2: int, p3: int, p4: java.lang.Object): void
