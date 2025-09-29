@@ -22,14 +22,6 @@ import org.jetbrains.kotlin.js.backend.ast.JsVars
 import org.jetbrains.kotlin.js.backend.ast.SourceInfoAwareJsNode
 import org.jetbrains.kotlin.js.parser.antlr.generated.JavaScriptParser
 
-internal fun ParserRuleContext.toJsLocationRelativeTo(file: String): JsLocation {
-    return JsLocation(file, start.line, start.charPositionInLine)
-}
-
-internal fun ParserRuleContext.toJsLocationRelativeTo(origin: JsLocation): JsLocation {
-    return JsLocation(origin.file, origin.startLine + start.line, origin.startChar + start.charPositionInLine)
-}
-
 internal val ParserRuleContext.startPosition: CodePosition
     get() = start.codePosition
 
@@ -43,13 +35,15 @@ internal val Token.codePosition: CodePosition
     get() = CodePosition(line, charPositionInLine)
 
 internal fun unwrapStringLiteral(literalValue: String): String {
-    if (literalValue.startsWith("'") && literalValue.endsWith("'"))
-        return literalValue.removeSurrounding("'")
+    literalValue.run {
+        if (startsWith("'") && endsWith("'"))
+            return removeSurrounding("'")
 
-    if (literalValue.startsWith("\"") && literalValue.endsWith("\""))
-        return literalValue.removeSurrounding("\"")
+        if (startsWith("\"") && endsWith("\""))
+            return removeSurrounding("\"")
 
-    return literalValue
+        return this
+    }
 }
 
 internal fun String.toStringLiteral(): JsStringLiteral {
@@ -64,10 +58,21 @@ internal fun String.toDecimalLiteral(): JsNumberLiteral {
     return JsDoubleLiteral(toDouble())
 }
 
-internal fun String.toHexLiteral(): JsIntLiteral {
-    return JsIntLiteral(removePrefix("0x").removePrefix("0X").hexToInt())
+internal fun String.toHexLiteral(): JsNumberLiteral {
+    val cleanHex = removePrefix("0x").removePrefix("0X")
+    val longValue = cleanHex.toLong(16)
+
+    return if (longValue in Int.MIN_VALUE..Int.MAX_VALUE)
+        JsIntLiteral(longValue.toInt())
+    else
+        JsDoubleLiteral(longValue.toDouble())
 }
 
-internal fun String.toOctalLiteral(): JsIntLiteral {
-    return JsIntLiteral(removePrefix("0").toInt())
+internal fun String.toOctalLiteral(): JsNumberLiteral {
+    val longValue = removePrefix("0").toLong(8)
+
+    return if (longValue in Int.MIN_VALUE..Int.MAX_VALUE)
+        JsIntLiteral(longValue.toInt())
+    else
+        JsDoubleLiteral(longValue.toDouble())
 }
