@@ -83,12 +83,12 @@ internal class BridgesSupport(val irBuiltIns: IrBuiltIns, val irFactory: IrFacto
             parent = function.parent
             val bridge = this
 
-            parameters = target.parameters.map {
-                it.copyTo(bridge, type = bridgeDirections.parameterDirectionAt(it.indexInParameters).type() ?: it.type)
-            }
-
             typeParameters = function.typeParameters.map { parameter ->
                 parameter.copyToWithoutSuperTypes(bridge).also { it.superTypes += parameter.superTypes }
+            }
+
+            parameters = target.parameters.map {
+                it.copyTo(bridge, type = bridgeDirections.parameterDirectionAt(it.indexInParameters).type() ?: it.type)
             }
         }
     }
