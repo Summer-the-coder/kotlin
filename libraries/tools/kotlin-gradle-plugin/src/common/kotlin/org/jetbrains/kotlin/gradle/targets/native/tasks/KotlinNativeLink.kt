@@ -125,6 +125,9 @@ constructor(
     val debuggable: Boolean by lazyConvention { binary.debuggable }
 
     @get:Input
+    val nativeCacheEnabled: Boolean by lazyConvention { binary.nativeCacheEnabled }
+
+    @get:Input
     val baseName: String by lazyConvention { binary.baseName }
 
     @get:Input
@@ -137,7 +140,7 @@ constructor(
 
     @Suppress("unused")
     @get:Input
-    internal val konanCacheKind: Provider<NativeCacheKind> = konanPropertiesService.map { it.defaultCacheKindForTarget(konanTarget) }
+    internal val konanCacheKind: Provider<NativeCacheKind> = konanPropertiesService.flatMap { it.getNativeCacheKind(konanTarget) }
 
     @Suppress("unused", "UNCHECKED_CAST")
     @Deprecated(
@@ -234,7 +237,7 @@ constructor(
     @get:Internal
     internal val externalDependenciesBuildCompilerArgs: ListProperty<String> = objectFactory.listProperty<String>().empty()
 
-    private val konanCacheDir = konanPropertiesService.map { it.defaultCacheKindForTarget(konanTarget) }
+    private val konanCacheDir = konanPropertiesService.flatMap { it.getNativeCacheKind(konanTarget) }
     private val gradleUserHomeDir = project.gradle.gradleUserHomeDir
     private val cacheBuilderSettings by lazy {
         CacheBuilder.Settings(
@@ -254,7 +257,6 @@ constructor(
 
     private class CacheSettings(
         val orchestration: NativeCacheOrchestration,
-        val kind: NativeCacheKind,
         val icEnabled: Boolean,
         val threads: Int,
         val gradleUserHomeDir: File,
@@ -263,7 +265,6 @@ constructor(
 
     private val cacheSettings = CacheSettings(
         project.getKonanCacheOrchestration(),
-        konanPropertiesService.map { it.defaultCacheKindForTarget(konanTarget) }.get(),
         project.isKonanIncrementalCompilationEnabled(),
         project.getKonanParallelThreads(),
         project.gradle.gradleUserHomeDir,
@@ -450,7 +451,7 @@ constructor(
                 addAll(externalDependenciesBuildCompilerArgs.get())
                 when (cacheSettings.orchestration) {
                     NativeCacheOrchestration.Compiler -> {
-                        if (cacheSettings.kind != NativeCacheKind.NONE
+                        if (nativeCacheEnabled
                             && !optimized
                             && konanPropertiesService.get().cacheWorksFor(konanTarget)
                         ) {

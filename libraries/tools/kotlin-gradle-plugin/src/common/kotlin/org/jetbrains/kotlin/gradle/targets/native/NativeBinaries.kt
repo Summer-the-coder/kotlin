@@ -91,8 +91,14 @@ sealed class NativeBinary(
     @Suppress("unused")
     @KotlinNativeCacheApi
     fun disableNativeCache(version: DisableNativeCacheInKotlinVersion, reason: String, issueUrl: URI? = null) {
-        disableCacheSettings.set(DisableNativeCacheSettings(version, reason, issueUrl))
+        konanPropertiesBuildService.cacheKindEnabledSettings.put(konanTarget, DisableNativeCacheSettings(version, reason, issueUrl))
     }
+
+    @OptIn(KotlinNativeCacheApi::class)
+    val nativeCacheEnabled: Boolean
+        get() = konanPropertiesBuildService
+            .cacheKindEnabledSettings.get()[konanTarget]
+            .let { it == null }
 
     var binaryOptions: MutableMap<String, String> = mutableMapOf()
 
@@ -136,13 +142,12 @@ sealed class NativeBinary(
         objects.directoryProperty().convention(layout.buildDirectory.dir("bin/$targetSubDirectory${this@NativeBinary.name}"))
     }
 
+    private val konanPropertiesBuildService
+        get() = linkTaskProvider.flatMap { it.konanPropertiesService }.get()
+
     private val outputFileProvider: Provider<File> by lazy {
         linkTaskProvider.flatMap { it.outputFile }
     }
-
-    @OptIn(KotlinNativeCacheApi::class)
-    internal val disableCacheSettings: Property<DisableNativeCacheSettings> =
-        project.objects.property(DisableNativeCacheSettings::class.java)
 
     val outputFile: File
         get() = outputFileProvider.get()

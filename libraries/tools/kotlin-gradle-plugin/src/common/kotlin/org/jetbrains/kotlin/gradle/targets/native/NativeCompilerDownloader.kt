@@ -295,7 +295,7 @@ internal fun Project.setupNativeCompiler(konanTarget: KonanTarget) {
             project.listProperty { nativeProperties.jvmArgs.get() },
             nativeProperties.actualNativeHomeDirectory,
             project.provider { nativeProperties.konanDataDir.orNull?.absolutePath },
-            konanPropertiesBuildService.map { it.defaultCacheKindForTarget(konanTarget) },
+            konanPropertiesBuildService.flatMap { it.getNativeCacheKind(konanTarget) },
         ).generatePlatformLibsIfNeeded()
     }
 }

@@ -9,6 +9,8 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
@@ -24,6 +26,7 @@ import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.*
+import javax.inject.Inject
 
 internal interface UsesKonanPropertiesBuildService : Task {
     @get:Internal
@@ -38,6 +41,9 @@ abstract class KonanPropertiesBuildService : BuildService<KonanPropertiesBuildSe
     internal interface Parameters : BuildServiceParameters {
         val konanHome: DirectoryProperty
     }
+
+    @get:Inject
+    abstract val objectFactory: ObjectFactory
 
     private val logger = Logging.getLogger(this::class.java)
 
@@ -57,12 +63,26 @@ abstract class KonanPropertiesBuildService : BuildService<KonanPropertiesBuildSe
             .map { KonanTarget.predefinedTargets.getValue(it) }
     }
 
+    @OptIn(KotlinNativeCacheApi::class)
+    @get:Internal
+    internal val cacheKindEnabledSettings: MapProperty<KonanTarget, DisableNativeCacheSettings?> = objectFactory.mapProperty(
+        KonanTarget::class.java,
+        DisableNativeCacheSettings::class.java
+    )
+
     internal fun defaultCacheKindForTarget(target: KonanTarget): NativeCacheKind =
         if (target in cacheableTargets && target !in targetsWithOptInStaticCaches) {
             NativeCacheKind.STATIC
         } else {
             NativeCacheKind.NONE
         }
+
+    @OptIn(KotlinNativeCacheApi::class)
+    internal fun getNativeCacheKind(konanTargets: KonanTarget) =
+        cacheKindEnabledSettings
+            .getting(konanTargets)
+            .map { NativeCacheKind.NONE }
+            .orElse(defaultCacheKindForTarget(konanTargets))
 
     internal fun cacheWorksFor(target: KonanTarget): Boolean =
         target in cacheableTargets
