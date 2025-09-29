@@ -10,17 +10,9 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.jetbrains.kotlin.js.backend.ast.JsDoubleLiteral
-import org.jetbrains.kotlin.js.backend.ast.JsExpressionStatement
-import org.jetbrains.kotlin.js.backend.ast.JsFunction
 import org.jetbrains.kotlin.js.backend.ast.JsIntLiteral
-import org.jetbrains.kotlin.js.backend.ast.JsLocation
-import org.jetbrains.kotlin.js.backend.ast.JsNode
 import org.jetbrains.kotlin.js.backend.ast.JsNumberLiteral
-import org.jetbrains.kotlin.js.backend.ast.JsParameter
 import org.jetbrains.kotlin.js.backend.ast.JsStringLiteral
-import org.jetbrains.kotlin.js.backend.ast.JsVars
-import org.jetbrains.kotlin.js.backend.ast.SourceInfoAwareJsNode
-import org.jetbrains.kotlin.js.parser.antlr.generated.JavaScriptParser
 
 internal val ParserRuleContext.startPosition: CodePosition
     get() = start.codePosition
@@ -31,8 +23,9 @@ internal val TerminalNode.startPosition: CodePosition
 internal val ParserRuleContext.stopPosition: CodePosition
     get() = stop.codePosition
 
+// JS AST line positioning is 0-based, while ANTLR line positioning is 1-based, so there is a need to adjust it
 internal val Token.codePosition: CodePosition
-    get() = CodePosition(line, charPositionInLine)
+    get() = CodePosition(line - 1, charPositionInLine)
 
 internal fun unwrapStringLiteral(literalValue: String): String {
     literalValue.run {
