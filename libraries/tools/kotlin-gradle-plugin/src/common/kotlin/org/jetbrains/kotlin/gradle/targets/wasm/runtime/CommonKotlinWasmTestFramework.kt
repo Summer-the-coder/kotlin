@@ -9,7 +9,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.process.ProcessForkOptions
 import org.jetbrains.kotlin.gradle.internal.testing.TCServiceMessagesClientSettings
 import org.jetbrains.kotlin.gradle.internal.testing.TCServiceMessagesTestExecutionSpec
@@ -22,6 +21,7 @@ import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTestFramework.Comp
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTestFramework.Companion.createTestExecutionSpecDeprecated
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinTestRunnerCliArgs
 import org.jetbrains.kotlin.gradle.utils.processes.ProcessLaunchOptions
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 
 class CommonKotlinWasmTestFramework(
     kotlinJsTest: KotlinJsTest,
@@ -29,7 +29,7 @@ class CommonKotlinWasmTestFramework(
     private val objects: ObjectFactory,
     private val providers: ProviderFactory,
 ) : KotlinJsTestFramework {
-    override val settingsState: String = "KotlinWasm${name.capitalized()}"
+    override val settingsState: String = "KotlinWasm${name.capitalizeAsciiOnly()}"
 
     private val testPath = kotlinJsTest.path
 

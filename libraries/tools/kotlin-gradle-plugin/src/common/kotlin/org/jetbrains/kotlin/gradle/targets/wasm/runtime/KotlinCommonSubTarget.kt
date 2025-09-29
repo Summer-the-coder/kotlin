@@ -7,11 +7,11 @@ package org.jetbrains.kotlin.gradle.targets.wasm.runtime
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.targets.js.ir.JsIrBinary
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrSubTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 import javax.inject.Inject
 
 abstract class KotlinCommonSubTarget
@@ -41,7 +41,7 @@ constructor(
     }
 
     val setupTask: TaskProvider<CommonSetupTask> = project.tasks.register(
-        "kotlin${name.capitalized()}Setup",
+        "kotlin${name.capitalizeAsciiOnly()}Setup",
         CommonSetupTask::class.java,
         envSpec
     ).also {
