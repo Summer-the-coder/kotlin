@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class DiagnosticsWasmTestGenerated extends AbstractDiagnosticsWasmTest {
   @Test
   public void testAllFilesPresentInWasmTests() {
-    KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/wasmTests"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
+    KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/wasmTests"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true, "jsInterop/nativeInvoke");
   }
 
   @Test
@@ -42,7 +42,7 @@ public class DiagnosticsWasmTestGenerated extends AbstractDiagnosticsWasmTest {
   public class JsInterop {
     @Test
     public void testAllFilesPresentInJsInterop() {
-      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/wasmTests/jsInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/wasmTests/jsInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true, "nativeInvoke");
     }
 
     @Test
