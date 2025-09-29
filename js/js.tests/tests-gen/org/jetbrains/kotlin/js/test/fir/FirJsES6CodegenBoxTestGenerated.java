@@ -57719,6 +57719,12 @@ public class FirJsES6CodegenBoxTestGenerated extends AbstractFirJsES6CodegenBoxT
     }
 
     @Test
+    @TestMetadata("remapTypeParameters.kt")
+    public void testRemapTypeParameters() {
+      runTest("compiler/testData/codegen/box/regressions/remapTypeParameters.kt");
+    }
+
+    @Test
     @TestMetadata("resolvedCallForGetOperator.kt")
     public void testResolvedCallForGetOperator() {
       runTest("compiler/testData/codegen/box/regressions/resolvedCallForGetOperator.kt");
