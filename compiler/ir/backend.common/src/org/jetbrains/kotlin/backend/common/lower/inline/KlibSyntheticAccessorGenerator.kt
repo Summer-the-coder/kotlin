@@ -96,6 +96,15 @@ class KlibSyntheticAccessorGenerator(
         contributeTopLevelDeclarationSuffix(field)
     }
 
+    override fun capturedTypeParameters(declaration: IrDeclaration): List<IrTypeParameter> {
+        val classParent = declaration.parent as? IrClass ?: return listOf()
+        return if (classParent.isInner) {
+            classParent.typeParameters + capturedTypeParameters(classParent)
+        } else {
+            classParent.typeParameters
+        }
+    }
+
     override fun createAccessorMarkerArgument(): IrConst =
         IrConstImpl.constNull(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.symbols.syntheticConstructorMarker.defaultType.makeNullable())
 
