@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     id("jps-compatible")
+    id("test-inputs-check")
 }
 
 dependencies {
