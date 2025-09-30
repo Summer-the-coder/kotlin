@@ -55,6 +55,13 @@ object FirPropertyFieldTypeChecker : FirPropertyChecker(MppCheckerKind.Common) {
             reporter.reportOn(backingField.source, FirErrors.BACKING_FIELD_FOR_DELEGATED_PROPERTY)
         }
 
+        // There's already `BACKING_FIELD_FOR_DELEGATED_PROPERTY`
+        if (declaration.delegate == null) {
+            if (declaration.getter.isExplicit) {
+                reporter.reportOn(declaration.getter?.source, FirErrors.PROPERTY_WITH_EXPLICIT_FIELD_AND_ACCESSORS)
+            }
+        }
+
         if (backingField.returnTypeRef.coneType == declaration.returnTypeRef.coneType) {
             reporter.reportOn(backingField.source, FirErrors.REDUNDANT_EXPLICIT_BACKING_FIELD)
             return
@@ -62,13 +69,6 @@ object FirPropertyFieldTypeChecker : FirPropertyChecker(MppCheckerKind.Common) {
 
         if (!backingField.isSubtypeOf(declaration, typeCheckerContext)) {
             reporter.reportOn(declaration.source, FirErrors.INCONSISTENT_BACKING_FIELD_TYPE)
-        }
-
-        // There's already `BACKING_FIELD_FOR_DELEGATED_PROPERTY`
-        if (declaration.delegate == null) {
-            if (declaration.getter.isExplicit) {
-                reporter.reportOn(declaration.getter?.source, FirErrors.PROPERTY_WITH_EXPLICIT_FIELD_AND_ACCESSORS)
-            }
         }
     }
 
