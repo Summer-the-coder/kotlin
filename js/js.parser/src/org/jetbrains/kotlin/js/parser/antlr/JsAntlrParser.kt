@@ -102,11 +102,8 @@ object JsAntlrParser {
         val inputStream = CharStreams.fromString(parserContext.code, parserContext.fileName).also {
             it.seek(parserContext.offset)
         }
-        val offsetStream = OffsetCharStream(
-            inputStream,
-            parserContext.startPosition.line,
-            parserContext.startPosition.offset)
-        val lexer = JavaScriptLexer(offsetStream).apply {
+        val lexer = JavaScriptLexer(inputStream).apply {
+            setTokenOffset(parserContext.startPosition.line, parserContext.startPosition.offset)
             removeErrorListeners()
             addErrorListener(errorReporter)
         }

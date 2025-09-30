@@ -1,6 +1,7 @@
 ﻿package org.jetbrains.kotlin.js.parser.antlr
 
 import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.CommonToken
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
 import org.jetbrains.kotlin.js.parser.antlr.generated.JavaScriptLexer
@@ -18,6 +19,9 @@ abstract class JavaScriptLexerBase(input: CharStream?) : Lexer(input) {
     private val scopeStrictModes: Deque<Boolean?> = ArrayDeque<Boolean?>()
 
     private var lastToken: Token? = null
+
+    private var offsetLine: Int = 0
+    private var offsetColumn: Int = 0
 
     /**
      * Default value of strict mode
@@ -60,6 +64,14 @@ abstract class JavaScriptLexerBase(input: CharStream?) : Lexer(input) {
     }
 
     /**
+     * Sets the shift that will be used to offset every token's position by the given amount while calling nextToken().
+     */
+    fun setTokenOffset(line: Int, column: Int) {
+        offsetLine = line
+        offsetColumn = column
+    }
+
+    /**
      * Return the next token from the character stream and records this last
      * token in case it resides on the default channel. This recorded token
      * is used to determine when the lexer could possibly match a regex
@@ -71,9 +83,15 @@ abstract class JavaScriptLexerBase(input: CharStream?) : Lexer(input) {
     override fun nextToken(): Token {
         val next = super.nextToken()
 
-        if (next.getChannel() == Token.DEFAULT_CHANNEL) {
+        if (next.channel == Token.DEFAULT_CHANNEL) {
             // Keep track of the last token on the default channel.
             this.lastToken = next
+        }
+
+        // This way we ensure we add proper offset to the token when embedding raw js() islands into the Kotlin source code.
+        if (next is CommonToken && next.getType() != Token.EOF) {
+            next.line = next.line + offsetLine
+            next.charPositionInLine = next.charPositionInLine + offsetColumn
         }
 
         return next
