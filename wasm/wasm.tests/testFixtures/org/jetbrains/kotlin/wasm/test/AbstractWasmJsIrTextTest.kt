@@ -37,7 +37,7 @@ import org.jetbrains.kotlin.wasm.test.converters.WasmPreSerializationLoweringFac
 import org.jetbrains.kotlin.wasm.test.handlers.FirWasmJsKlibAbiDumpBeforeInliningSavingHandler
 
 abstract class AbstractWasmJsIrTextTest :
-    AbstractNonJvmIrTextTest<FirOutputArtifact>(WasmPlatforms.wasmJs, TargetBackend.WASM) {
+    AbstractNonJvmIrTextTest<FirOutputArtifact>(WasmPlatforms.wasmJs, TargetBackend.WASM_JS) {
     override val frontend: FrontendKind<*>
         get() = FrontendKinds.FIR
 
