@@ -139,6 +139,10 @@ private class Conjunction(val terms: List<Disjunction>) : Predicate() {
     override fun size() = terms.sumOf { it.size }
 }
 
+private const val MaxSize = 10_000
+
+private class DivergingAnalysisError(message: String) : Throwable(message)
+
 @Suppress("ConvertArgumentToSet")
 private object Predicates {
     fun disjunctionOf(vararg terms: LeafIndexWithValue): Predicate =
@@ -236,6 +240,7 @@ private object Predicates {
             val leftTerms = (leftPredicate as Conjunction).terms
             val rightTerms = (rightPredicate as Conjunction).terms
             val resultDisjunctions = ArrayList<Disjunction>((leftTerms.size + rightTerms.size) * 2)
+            var size = 0
             var removedCount = 0
             for (leftTerm in leftTerms) {
                 for (rightTerm in rightTerms) {
@@ -258,8 +263,12 @@ private object Predicates {
                             replacedRemoved = true
                         }
                     }
-                    if (!replacedRemoved)
+                    if (!replacedRemoved) {
                         resultDisjunctions.add(currentDisjunction)
+                        size += currentDisjunction.size
+                        if (size >= MaxSize)
+                            throw DivergingAnalysisError("Max size exceeded: $size")
+                    }
                 }
             }
 
@@ -359,8 +368,6 @@ private object Predicates {
         }
     }
 }
-
-private class DivergingAnalysisError(message: String) : Throwable(message)
 
 internal class CastsOptimization(val context: Context) : BodyLoweringPass {
     private val not = context.irBuiltIns.booleanNotSymbol
@@ -491,14 +498,6 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
     }
 
     override fun lower(irBody: IrBody, container: IrDeclaration) {
-        var maxSize = 0
-
-        fun updateMaxSize(size: Int) {
-            maxSize = kotlin.math.max(maxSize, size)
-            if (maxSize >= 10_000)
-                throw DivergingAnalysisError("Max size exceeded: $maxSize")
-        }
-
         val typeCheckResults = mutableMapOf<IrTypeOperatorCall, TypeCheckResult>()
         val visitor = object : IrVisitor<VisitorResult, Predicate>() {
             val leafTerms = mutableListOf<LeafTerm>()
@@ -570,8 +569,6 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                         cfmpInfo.predicate,
                         getFullPredicate(result.predicate, false, cfmpInfo.level)
                 )
-
-                updateMaxSize(cfmpInfo.predicate.size())
             }
 
             fun finishControlFlowMerging(irElement: IrElement, cfmpInfo: ControlFlowMergePointInfo): VisitorResult {
@@ -1161,8 +1158,6 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                         for ((variable, alias) in savedVariableAliases)
                             variableAliases[variable] = alias
                         predicate = Predicates.and(predicate, conditionBooleanPredicate.ifFalse)
-
-                        updateMaxSize(predicate.size())
                     }
                 }
                 context.logMultiple {
@@ -1282,9 +1277,6 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
             context.log { "ERROR: the analysis has diverged for ${container.render()}: ${t.message}\n" }
             return
         }
-
-        if (maxSize > 0) // TODO: fallback if size is too big (KT-77672).
-            context.log { "MAX SIZE = $maxSize" }
 
         if (typeCheckResults.isEmpty()) return
         val irBuilder = context.createIrBuilder(container.symbol)
