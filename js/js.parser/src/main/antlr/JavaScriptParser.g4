@@ -403,8 +403,8 @@ singleExpressionImpl
     | singleExpressionImpl '&&' singleExpressionImpl                               # LogicalAndExpression
     | singleExpressionImpl '||' singleExpressionImpl                               # LogicalOrExpression
     | singleExpressionImpl '?' singleExpressionImpl ':' singleExpressionImpl       # TernaryExpression
-    | <assoc = right> singleExpressionImpl '=' singleExpressionImpl                # AssignmentExpression
-    | <assoc = right> singleExpressionImpl assignmentOperator singleExpressionImpl # AssignmentOperatorExpression
+    | <assoc = right> lhs=singleExpressionImpl '=' rhs=singleExpressionImpl                # AssignmentExpression
+    | <assoc = right> lhs=singleExpressionImpl assignmentOperator rhs=singleExpressionImpl # AssignmentOperatorExpression
     | Import '(' singleExpressionImpl ')'                                          # ImportExpression
     | singleExpressionImpl templateStringLiteral                                   # TemplateStringExpression // ECMAScript 6
     | (Yield | YieldStar) ({this.notLineTerminator()}? expressionSequence)?        # YieldExpression          // ECMAScript 6

@@ -6442,13 +6442,15 @@ public class JavaScriptParser extends JavaScriptParserBase {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AssignmentExpressionContext extends SingleExpressionImplContext {
+		public SingleExpressionImplContext lhs;
+		public SingleExpressionImplContext rhs;
+		public TerminalNode Assign() { return getToken(JavaScriptParser.Assign, 0); }
 		public List<SingleExpressionImplContext> singleExpressionImpl() {
 			return getRuleContexts(SingleExpressionImplContext.class);
 		}
 		public SingleExpressionImplContext singleExpressionImpl(int i) {
 			return getRuleContext(SingleExpressionImplContext.class,i);
 		}
-		public TerminalNode Assign() { return getToken(JavaScriptParser.Assign, 0); }
 		public AssignmentExpressionContext(SingleExpressionImplContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -7067,14 +7069,16 @@ public class JavaScriptParser extends JavaScriptParserBase {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AssignmentOperatorExpressionContext extends SingleExpressionImplContext {
+		public SingleExpressionImplContext lhs;
+		public SingleExpressionImplContext rhs;
+		public AssignmentOperatorContext assignmentOperator() {
+			return getRuleContext(AssignmentOperatorContext.class,0);
+		}
 		public List<SingleExpressionImplContext> singleExpressionImpl() {
 			return getRuleContexts(SingleExpressionImplContext.class);
 		}
 		public SingleExpressionImplContext singleExpressionImpl(int i) {
 			return getRuleContext(SingleExpressionImplContext.class,i);
-		}
-		public AssignmentOperatorContext assignmentOperator() {
-			return getRuleContext(AssignmentOperatorContext.class,0);
 		}
 		public AssignmentOperatorExpressionContext(SingleExpressionImplContext ctx) { copyFrom(ctx); }
 		@Override
@@ -7723,25 +7727,27 @@ public class JavaScriptParser extends JavaScriptParserBase {
 					case 17:
 						{
 						_localctx = new AssignmentExpressionContext(new SingleExpressionImplContext(_parentctx, _parentState));
+						((AssignmentExpressionContext)_localctx).lhs = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_singleExpressionImpl);
 						setState(906);
 						if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
 						setState(907);
 						match(Assign);
 						setState(908);
-						singleExpressionImpl(13);
+						((AssignmentExpressionContext)_localctx).rhs = singleExpressionImpl(13);
 						}
 						break;
 					case 18:
 						{
 						_localctx = new AssignmentOperatorExpressionContext(new SingleExpressionImplContext(_parentctx, _parentState));
+						((AssignmentOperatorExpressionContext)_localctx).lhs = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_singleExpressionImpl);
 						setState(909);
 						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
 						setState(910);
 						assignmentOperator();
 						setState(911);
-						singleExpressionImpl(12);
+						((AssignmentOperatorExpressionContext)_localctx).rhs = singleExpressionImpl(12);
 						}
 						break;
 					case 19:

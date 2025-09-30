@@ -128,6 +128,7 @@ object JsAntlrParser {
     private fun parseExpression(accReporter: AccumulatingReporter) = parseAndMap(
         accReporter,
         parseFunc = { parser -> parser.singleExpression() },
+        validateFunc = { expression -> expression.accept(AntlrJsValidationVisitor(accReporter)) },
         mapFunc = { expression -> JsAstMapper(parserContext.scope, parserContext.fileName, accReporter).mapExpression(expression) }
     )
 
@@ -135,6 +136,7 @@ object JsAntlrParser {
     private fun parseStatements(accReporter: AccumulatingReporter) = parseAndMap(
         accReporter,
         parseFunc = { parser -> parser.statementList()?.statement() },
+        validateFunc = { statements -> statements.forEach { it.accept(AntlrJsValidationVisitor(accReporter)) } },
         mapFunc = { statements ->
             statements.filterNotNull().map { JsAstMapper(parserContext.scope, parserContext.fileName, accReporter).mapStatement(it) }
         }
@@ -144,6 +146,7 @@ object JsAntlrParser {
     private fun parseFunction(accReporter: AccumulatingReporter) = parseAndMap(
         accReporter,
         parseFunc = { parser -> parser.functionDeclaration() },
+        validateFunc = { function -> function.accept(AntlrJsValidationVisitor(accReporter)) },
         mapFunc = { function -> JsAstMapper(parserContext.scope, parserContext.fileName, accReporter).mapFunction(function) }
     )
 
@@ -151,6 +154,7 @@ object JsAntlrParser {
     private fun <TParseResult, TMapResult> parseAndMap(
         reporter: AccumulatingReporter,
         parseFunc: (JavaScriptParser) -> TParseResult?,
+        validateFunc: (TParseResult) -> Unit,
         mapFunc: (TParseResult) -> TMapResult
     ): TMapResult? {
         try {
@@ -162,6 +166,7 @@ object JsAntlrParser {
             if (reporter.hasErrors) {
                 return null
             }
+            validateFunc(parsedResult)
             return mapFunc(parsedResult)
         } catch (ex: Throwable) {
             reporter.error("Failed to parse: ${ex.message}", parserContext.startPosition, parserContext.startPosition)

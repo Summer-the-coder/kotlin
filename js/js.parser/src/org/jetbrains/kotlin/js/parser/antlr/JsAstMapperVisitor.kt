@@ -22,7 +22,7 @@ class JsAstMapperVisitor(
     private val fileName: String,
     private val scopeContext: ScopeContext,
     private val reporter: ErrorReporter
-) : JavaScriptParserBaseVisitor<JsNode?>() {
+) : AntlrJsBaseVisitor<JsNode?>() {
     override fun visitSourceElement(ctx: JavaScriptParser.SourceElementContext): JsNode? {
         return visitNode<JsStatement?>(ctx.statement())
     }
@@ -1129,21 +1129,6 @@ class JsAstMapperVisitor(
 
     private fun makeRefNode(identifier: String): JsNameRef {
         return scopeContext.globalNameFor(identifier).makeRef()
-    }
-
-    private inline fun <reified T> visitNode(node: ParseTree): T =
-        visit(node).expect<T>()
-
-    private inline fun <reified T> visitAll(nodes: List<ParseTree>): List<T> =
-        nodes.map { visitNode<T>(it) }
-
-    private inline fun <reified T> JsNode?.expect(): T {
-        if (this !is T) raiseParserException("Expected ${T::class}, got ${this?.javaClass}")
-        return this
-    }
-
-    private fun raiseParserException(message: String, rule: ParserRuleContext? = null): Nothing {
-        throw JsParserException("Parser encountered internal error: $message", rule?.startPosition ?: CodePosition(0, 0))
     }
 
     private fun reportWarning(message: String, position: CodePosition? = null) {
