@@ -379,17 +379,17 @@ val createJscRunner by task<CreateJscRunner> {
 }
 
 fun Test.setupSpiderMonkey() {
-    val jsShellUnpackedDirectory = jsShellUnpackedDirectory
-
     inputs.files(unzipJsShell.map { it.outputs })
         .withPathSensitivity(PathSensitivity.RELATIVE)
         .withPropertyName("jsShellUnzipped")
 
-    doFirst {
-        val jsShellExecutablePath = jsShellUnpackedDirectory.get()
-            .resolve("js")
-            .absolutePath
-        systemProperty("javascript.engine.path.SpiderMonkey", jsShellExecutablePath)
+    val jsShellUnpackedDirectory = jsShellUnpackedDirectory.map {
+        it.resolve("js").absolutePath
+    }
+
+    jvmArgumentProviders += objects.newInstance<SystemPropertyClasspathProvider>().apply {
+        classpath.from(jsShellUnpackedDirectory)
+        property.set("javascript.engine.path.SpiderMonkey")
     }
 }
 
@@ -399,11 +399,13 @@ fun Test.setupWasmEdge() {
         .withPathSensitivity(PathSensitivity.RELATIVE)
         .withPropertyName("wasmEdgeUnzipped")
 
-    doFirst {
-        val wasmEdgeExecutablePath = wasmEdgeUnpackedDirectory.get()
-            .resolve("bin/wasmedge")
-            .absolutePath
-        systemProperty("wasm.engine.path.WasmEdge", wasmEdgeExecutablePath)
+    val wasmEdgeExecutablePath = wasmEdgeUnpackedDirectory.map {
+        it.resolve("bin/wasmedge").absolutePath
+    }
+
+    jvmArgumentProviders += objects.newInstance<SystemPropertyClasspathProvider>().apply {
+        classpath.from(wasmEdgeExecutablePath)
+        property.set("wasm.engine.path.WasmEdge")
     }
 }
 
@@ -413,8 +415,10 @@ fun Test.setupJsc() {
         .withPathSensitivity(PathSensitivity.RELATIVE)
         .withPropertyName("jscRunner")
 
-    doFirst {
-        systemProperty("javascript.engine.path.JavaScriptCore", jscRunner.get().absolutePath)
+    val jscExecutablePath = jscRunner.map { it.absolutePath }
+    jvmArgumentProviders += objects.newInstance<SystemPropertyClasspathProvider>().apply {
+        classpath.from(jscExecutablePath)
+        property.set("javascript.engine.path.JavaScriptCore")
     }
 }
 
