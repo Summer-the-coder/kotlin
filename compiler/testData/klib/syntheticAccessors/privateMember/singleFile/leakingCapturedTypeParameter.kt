@@ -13,7 +13,6 @@ class A<T> {
     }
 
     inner class C<S> private constructor(val x: S) {
-        @Suppress("INVISIBLE_REFERENCE")
         internal inline fun copy() = C<Int>(42)
     }
     @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
