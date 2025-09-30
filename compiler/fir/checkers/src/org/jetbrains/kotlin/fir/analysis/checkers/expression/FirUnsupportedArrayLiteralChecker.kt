@@ -17,13 +17,10 @@ import org.jetbrains.kotlin.fir.expressions.FirArrayLiteral
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.resolvedType
 
 object FirUnsupportedArrayLiteralChecker : FirArrayLiteralChecker(MppCheckerKind.Common) {
-
-    private enum class ContainingCallKind {
-        NotFound, FunctionReturningAnnotation, Annotation
-    }
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun check(expression: FirArrayLiteral) {
@@ -40,21 +37,32 @@ object FirUnsupportedArrayLiteralChecker : FirArrayLiteralChecker(MppCheckerKind
         }
     }
 
+    private enum class ContainingCallKind {
+        NotFound, FunctionReturningAnnotation, Annotation
+    }
+
     // See KT-81141
     context(context: CheckerContext)
     private fun containingCallKind(): ContainingCallKind {
-        return context.callsOrAssignments.asReversed().maxOfOrNull {
-            when (it) {
-                is FirFunctionCall if it.resolvedType.toRegularClassSymbol()?.classKind == ClassKind.ANNOTATION_CLASS ->
-                    ContainingCallKind.FunctionReturningAnnotation
-                is FirAnnotationCall -> ContainingCallKind.Annotation
-                else -> ContainingCallKind.NotFound
+        var functionCallFound = ContainingCallKind.NotFound
+        for (call in context.callsOrAssignments.asReversed()) {
+            when (call) {
+                is FirAnnotationCall ->
+                    return ContainingCallKind.Annotation
+                is FirFunctionCall if call.resolvedType.isAnnotationClass() ->
+                    functionCallFound = ContainingCallKind.FunctionReturningAnnotation
             }
-        } ?: ContainingCallKind.NotFound
+        }
+        return functionCallFound
     }
 
     context(context: CheckerContext)
     private fun isInsideAnnotationConstructor(): Boolean {
-        return context.findClosest<FirConstructorSymbol>()?.resolvedReturnType?.toRegularClassSymbol()?.classKind == ClassKind.ANNOTATION_CLASS
+        return context.findClosest<FirConstructorSymbol>()?.resolvedReturnType.isAnnotationClass()
+    }
+
+    context(context: CheckerContext)
+    private fun ConeKotlinType?.isAnnotationClass(): Boolean {
+        return this?.toRegularClassSymbol()?.classKind == ClassKind.ANNOTATION_CLASS
     }
 }
