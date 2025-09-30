@@ -338,14 +338,11 @@ abstract class SyntheticAccessorGenerator<Context : LoweringContext, ScopeInfo>(
         call: IrFunctionAccessExpression,
         syntheticFunction: IrFunction
     ) {
-        val typeArgumentsToPass = if (syntheticFunction is IrConstructor) {
-            syntheticFunction.parentAsClass.typeParameters + syntheticFunction.typeParameters
-        } else {
-            syntheticFunction.typeParameters.filter { it.origin != IrDeclarationOrigin.SYNTHETIC_ACCESSOR_CAPTURED_TYPE_PARAMETER }
-        }
-        typeArgumentsToPass.forEachIndexed { i, param ->
-            call.typeArguments[i] = param.defaultType
-        }
+        syntheticFunction.allTypeParameters
+            .filter { it.origin != IrDeclarationOrigin.SYNTHETIC_ACCESSOR_CAPTURED_TYPE_PARAMETER }
+            .forEachIndexed { i, param ->
+                call.typeArguments[i] = param.defaultType
+            }
 
         val delegateTo = call.symbol.owner
 
