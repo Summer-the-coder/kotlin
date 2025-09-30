@@ -2,29 +2,24 @@
 
 class A<T> {
     private fun foo(x: T) = x
-    @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-    inline fun callFoo(x: T) = foo(x)
+    internal inline fun callFoo(x: T) = foo(x)
 
     private fun <U> baz(x: T, y: U) = x to y
-    @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-    inline fun <U> callBaz(x: T, y: U) = baz(x, y)
+    internal inline fun <U> callBaz(x: T, y: U) = baz(x, y)
 
     inner class B<S> {
         private fun bar(x: T, y: S) = x to y
-        @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-        inline fun callBar(x: T, y: S) = bar(x, y)
+        internal inline fun callBar(x: T, y: S) = bar(x, y)
     }
 
     companion object Companion {
         private fun bar(x: Any) = x
-        @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-        inline fun callBar(x: Any) = bar(x)
+        internal inline fun callBar(x: Any) = bar(x)
     }
 
     class Nested {
         private fun bar(x: Any) = x
-        @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-        inline fun callBar(x: Any) = bar(x)
+        internal inline fun callBar(x: Any) = bar(x)
     }
 }
 
