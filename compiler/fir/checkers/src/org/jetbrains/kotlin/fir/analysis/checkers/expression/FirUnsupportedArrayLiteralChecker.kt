@@ -14,16 +14,16 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.context.findClosest
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
-import org.jetbrains.kotlin.fir.expressions.FirCollectionLiteralCall
+import org.jetbrains.kotlin.fir.expressions.FirCollectionLiteral
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.languageVersionSettings
 import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.types.resolvedType
 
-object FirUnsupportedArrayLiteralChecker : FirCollectionLiteralCallChecker(MppCheckerKind.Common) {
+object FirUnsupportedArrayLiteralChecker : FirCollectionLiteralChecker(MppCheckerKind.Common) {
     context(context: CheckerContext, reporter: DiagnosticReporter)
-    override fun check(expression: FirCollectionLiteralCall) {
+    override fun check(expression: FirCollectionLiteral) {
         if (context.session.languageVersionSettings.supportsFeature(LanguageFeature.CollectionLiterals)) return
 
         if (!isInsideAnnotationCall() && !isInsideAnnotationConstructor()) {
