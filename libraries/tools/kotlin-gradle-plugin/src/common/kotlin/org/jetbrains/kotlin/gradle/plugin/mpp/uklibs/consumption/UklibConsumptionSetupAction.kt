@@ -9,7 +9,6 @@ import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.artifacts.VariantMetadata
 import org.gradle.api.attributes.*
@@ -270,34 +269,7 @@ private fun Project.workaroundLegacySkikoResolutionKT77539() {
     }
 }
 
-/**
- * KT-77539: Skiko used to publish with a hacky Android variant which was actually a jvm("android") target. The artifacts weren't actually
- * published to Maven central. In the future Skiko should start publishing with proper androidTarget() attributes, and this hack will no
- * longer be necessary
- */
-private fun Project.workaroundLegacySkikoResolutionKT77539() {
-    dependencies.components.withModule("org.jetbrains.skiko:skiko") {
-        val configureAndroidEnvironment: (VariantMetadata) -> Unit = {
-            it.attributes.attribute(
-                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-                project.objects.named(TargetJvmEnvironment.ANDROID),
-            )
-        }
-        it.withVariant("androidApiElements-published") { configureAndroidEnvironment(it) }
-        it.withVariant("androidRuntimeElements-published") { configureAndroidEnvironment(it) }
-
-        val configureJvmEnvironment: (VariantMetadata) -> Unit = {
-            it.attributes.attribute(
-                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-                project.objects.named(TargetJvmEnvironment.STANDARD_JVM),
-            )
-        }
-        it.withVariant("awtApiElements-published") { configureJvmEnvironment(it) }
-        it.withVariant("awtRuntimeElements-published") { configureJvmEnvironment(it) }
-    }
-}
-
-private class AllowPlatformConfigurationsToFallBackToMetadataForLenientKmpResolution : AttributeCompatibilityRule<KotlinPlatformType> {
+private class AllowPlatformConfigurationsToFallBackToMetadataAndJvmForLenientKmpResolution : AttributeCompatibilityRule<KotlinPlatformType> {
     override fun execute(details: CompatibilityCheckDetails<KotlinPlatformType>) = with(details) {
         consumerValue?.name ?: return@with
         // Fallback to metadata
