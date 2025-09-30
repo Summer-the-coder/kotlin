@@ -29,26 +29,26 @@ import org.jetbrains.kotlin.fir.types.resolvedType
 object FirUnsupportedArrayLiteralChecker : FirArrayLiteralChecker(MppCheckerKind.Common) {
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
-    private fun reportUnsupported(expression: FirArrayLiteral, forceError: Boolean = true) {
-        if (forceError) {
-            reporter.reportOn(expression.source, FirErrors.UNSUPPORTED_ARRAY_LITERAL_OUTSIDE_OF_ANNOTATION.errorFactory)
-        } else {
-            reporter.reportOn(expression.source, FirErrors.UNSUPPORTED_ARRAY_LITERAL_OUTSIDE_OF_ANNOTATION)
-        }
-    }
-
-    context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun check(expression: FirArrayLiteral) {
         if (isInsideAnnotationConstructor()) return
 
         when (containingCallKind()) {
             ContainingCallKind.Annotation -> {}
-            ContainingCallKind.FunctionReturningAnnotation-> {
-                reportUnsupported(expression, forceError = expression.inInDefinitelyFailingPosition())
+            ContainingCallKind.FunctionReturningAnnotation -> {
+                reportUnsupported(expression, forceError = expression.isInDefinitelyFailingPosition())
             }
             ContainingCallKind.NotFound -> {
-                reportUnsupported(expression)
+                reportUnsupported(expression, forceError = true)
             }
+        }
+    }
+
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    private fun reportUnsupported(expression: FirArrayLiteral, forceError: Boolean) {
+        if (forceError) {
+            reporter.reportOn(expression.source, FirErrors.UNSUPPORTED_ARRAY_LITERAL_OUTSIDE_OF_ANNOTATION.errorFactory)
+        } else {
+            reporter.reportOn(expression.source, FirErrors.UNSUPPORTED_ARRAY_LITERAL_OUTSIDE_OF_ANNOTATION)
         }
     }
 
@@ -72,14 +72,33 @@ object FirUnsupportedArrayLiteralChecker : FirArrayLiteralChecker(MppCheckerKind
     }
 
     /**
-     * In some cases when a collection literal is used as an independent statement, it crushes Fir2Ir.
+     * In some cases when a collection literal is used as an independent statement, it crashes Fir2Ir.
      * Therefore, we always need to report an error for such cases.
+     * ```
+     * run {
+     *     ["42"]
+     *     Anno()
+     * }
+     *
+     * run {
+     *     if (true) { ["42"] }
+     *     Anno()
+     * }
+     * ```
+     *
+     * In other (similar) cases, the code might still work.
+     * ```
+     * run {
+     *     if (true) ["42"]
+     *     Anno()
+     * }
+     * ```
      */
     context(context: CheckerContext)
-    private fun FirArrayLiteral.inInDefinitelyFailingPosition(): Boolean {
+    private fun FirArrayLiteral.isInDefinitelyFailingPosition(): Boolean {
         val containingBlock = context.secondToLastContainer as? FirBlock ?: return false
 
-        return when (nthLastContainer(3)) {
+        return when (context.nthLastContainer(3)) {
             is FirAnonymousFunction -> containingBlock.isUnitCoerced || containingBlock.lastExpression !== this
             else -> containingBlock !is FirSingleExpressionBlock
         }

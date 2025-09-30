@@ -436,8 +436,7 @@ val ConeTypeProjection.isConflictingOrNotInvariant: Boolean get() = kind != Proj
 val CheckerContext.secondToLastContainer: FirElement?
     get() = nthLastContainer(2)
 
-context (checker: CheckerContext)
-fun nthLastContainer(n: Int): FirElement? = checker.containingElements.let { it.getOrNull(it.size - n) }
+fun CheckerContext.nthLastContainer(n: Int): FirElement? = containingElements.let { it.getOrNull(it.size - n) }
 
 context(context: CheckerContext, reporter: DiagnosticReporter)
 fun checkTypeMismatch(
