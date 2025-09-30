@@ -15,6 +15,19 @@ public class A<T : Any?>
             /* ACCESSOR use-site */ access$bar<S, T>($this = <this>, x = x, y = y)
         /* ACCESSOR declaration */ internal /* static */ fun <S : Any?, T : Any?> access$bar($this: B<S, T>, x: T, y: S): Pair<T, S>
             /* TARGET use-site */ $this.bar(x = x, y = y)
+    public inner class C<S : Any?>
+        /* TARGET declaration */ private constructor(x: S) /* primary */
+        internal inline fun copy(): C<Int, T>
+            /* ACCESSOR use-site */ access$<outer-this-0><S, T>($this = <this>)
+            /* ACCESSOR use-site */ access$<outer-this-0><S, T>($this = <this>).C<Int>(x = 42, $constructor_marker = null)
+        /* ACCESSOR declaration */ private fun <outer-this-0>(): A<T>
+            /* TARGET use-site */ <this>
+        /* ACCESSOR declaration */ internal constructor(x: S, $constructor_marker: SyntheticConstructorMarker?)
+            /* TARGET use-site */ <this>.C<S>(x = x)
+        /* ACCESSOR declaration */ internal /* static */ fun <S : Any?, T : Any?> access$<outer-this-0>($this: C<S, T>): A<T>
+            /* ACCESSOR use-site */ $this.<outer-this-0>()
+    internal inline fun getC(s: String): C<String, T>
+        /* ACCESSOR use-site */ <this>.C<String>(x = s, $constructor_marker = null)
     public companion object Companion
         /* TARGET declaration */ private fun bar(x: Any): Any
         internal inline fun callBar(x: Any): Any
@@ -31,9 +44,15 @@ public class A<T : Any?>
         /* TARGET use-site */ $this.foo(x = x)
     /* ACCESSOR declaration */ internal /* static */ fun <T : Any?, U : Any?> access$baz($this: A<T>, x: T, y: U): Pair<T, U>
         /* TARGET use-site */ $this.baz<U>(x = x, y = y)
+    /* TARGET declaration */ <this>: A<T>
 public fun box(): String
     /* ACCESSOR use-site */ access$foo<Any?>($this = this, x = x)
     /* ACCESSOR use-site */ access$baz<Any?, Any?>($this = this, x = x, y = y)
     /* ACCESSOR use-site */ access$baz<Any?, Any?>($this = this, x = x, y = y)
     /* ACCESSOR use-site */ access$bar<Any?, Any?>($this = this, x = x, y = y)
     /* ACCESSOR use-site */ access$bar<Any?, Any?>($this = this, x = x, y = y)
+    /* ACCESSOR use-site */ this.C<String>(x = s, $constructor_marker = null)
+    val tmp0: C<Any?, Any?>
+        /* ACCESSOR use-site */ this.C<String>(x = s, $constructor_marker = null)
+    /* ACCESSOR use-site */ access$<outer-this-0><Any?, Any?>($this = this)
+    /* ACCESSOR use-site */ access$<outer-this-0><Any?, Any?>($this = this).C<Int>(x = 42, $constructor_marker = null)
