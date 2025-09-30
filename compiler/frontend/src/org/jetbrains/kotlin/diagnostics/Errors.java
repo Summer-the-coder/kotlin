@@ -955,10 +955,10 @@ public interface Errors {
 
     DiagnosticFactoryForDeprecation1<KtExpression, KotlinType> ASSIGNING_SINGLE_ELEMENT_TO_VARARG_IN_NAMED_FORM_FUNCTION =
             DiagnosticFactoryForDeprecation1.create(LanguageFeature.ProhibitAssigningSingleElementsToVarargsInNamedForm);
-    DiagnosticFactory0<KtExpression> REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_FUNCTION = DiagnosticFactory0.create(WARNING);
+    DiagnosticFactory0<PsiElement> REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_FUNCTION = DiagnosticFactory0.create(WARNING);
     DiagnosticFactoryForDeprecation0<KtExpression> ASSIGNING_SINGLE_ELEMENT_TO_VARARG_IN_NAMED_FORM_ANNOTATION =
             DiagnosticFactoryForDeprecation0.create(LanguageFeature.ProhibitAssigningSingleElementsToVarargsInNamedForm);
-    DiagnosticFactory0<KtExpression> REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_ANNOTATION = DiagnosticFactory0.create(WARNING);
+    DiagnosticFactory0<PsiElement> REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_ANNOTATION = DiagnosticFactory0.create(WARNING);
 
     // Call resolution
 

@@ -52,9 +52,9 @@ class AssigningNamedArgumentToVarargChecker : CallChecker {
         context: ResolutionContext<*>
     ) {
         if (isArrayOrArrayLiteral(argument, context.trace)) {
-            if (argument.hasSpread()) {
+            argument.getSpreadElement()?.let {
                 // We want to make calls @Foo(value = [A]) and @Foo(value = *[A]) equivalent
-                context.trace.report(Errors.REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_ANNOTATION.on(argumentExpression))
+                context.trace.report(Errors.REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_ANNOTATION.on(it))
             }
         } else {
             context.trace.report(
@@ -73,8 +73,8 @@ class AssigningNamedArgumentToVarargChecker : CallChecker {
             context.languageVersionSettings.supportsFeature(AllowAssigningArrayElementsToVarargsInNamedFormForFunctions)
             && isArrayOrArrayLiteral(argument, context.trace)
         ) {
-            if (argument.hasSpread()) {
-                context.trace.report(Errors.REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_FUNCTION.on(argumentExpression))
+            argument.getSpreadElement()?.let {
+                context.trace.report(Errors.REDUNDANT_SPREAD_OPERATOR_IN_NAMED_FORM_IN_FUNCTION.on(it))
             }
         } else {
             if (!argument.hasSpread()) {

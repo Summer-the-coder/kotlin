@@ -1960,12 +1960,12 @@ internal class AssigningSingleElementToVarargInNamedFormAnnotationWarningImpl(
 internal class RedundantSpreadOperatorInNamedFormInFunctionImpl(
     firDiagnostic: KtPsiDiagnostic,
     token: KaLifetimeToken,
-) : KaAbstractFirDiagnostic<KtExpression>(firDiagnostic, token), KaFirDiagnostic.RedundantSpreadOperatorInNamedFormInFunction
+) : KaAbstractFirDiagnostic<PsiElement>(firDiagnostic, token), KaFirDiagnostic.RedundantSpreadOperatorInNamedFormInFunction
 
 internal class RedundantSpreadOperatorInNamedFormInAnnotationImpl(
     firDiagnostic: KtPsiDiagnostic,
     token: KaLifetimeToken,
-) : KaAbstractFirDiagnostic<KtExpression>(firDiagnostic, token), KaFirDiagnostic.RedundantSpreadOperatorInNamedFormInAnnotation
+) : KaAbstractFirDiagnostic<PsiElement>(firDiagnostic, token), KaFirDiagnostic.RedundantSpreadOperatorInNamedFormInAnnotation
 
 internal class IllegalTypeArgumentForVarargParameterWarningImpl(
     override val type: KaType,
