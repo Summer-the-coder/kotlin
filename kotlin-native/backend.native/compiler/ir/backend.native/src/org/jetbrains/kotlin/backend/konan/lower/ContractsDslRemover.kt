@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.backend.konan.lower
 
 import org.jetbrains.kotlin.backend.common.DeclarationContainerLoweringPass
 import org.jetbrains.kotlin.backend.konan.Context
-import org.jetbrains.kotlin.contracts.parsing.ContractsDslNames
+import org.jetbrains.kotlin.fir.resolve.transformers.contracts.ContractsDslNames
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.util.hasAnnotation
