@@ -175,7 +175,7 @@ abstract class FirAbstractContractResolveTransformerDispatcher(
             // We generate a FirContractCallBlock according to a heuristic, which can have false positives,
             // such as user-defined functions called "contract". In this case, we restore the contract call block
             // to a normal call.
-            if (resolvedContractCall.toResolvedCallableSymbol()?.callableId != FirContractsDslNames.CONTRACT) {
+            if (resolvedContractCall.toResolvedCallableSymbol()?.callableId != ContractsDslNames.CONTRACT) {
                 if (hasBodyContract) {
                     owner.body!!.replaceFirstStatement<FirContractCallBlock> { contractDescription.contractCall }
                 }
