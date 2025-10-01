@@ -46,7 +46,7 @@ class NonIncrementalCompilationSmokeTest : BaseCompilationTest() {
 
             module1.compile { module ->
                 assertOutputs(module, "bpkg/MainKt.class", "bpkg/BClass.class")
-                if (strategyConfig.first::class.simpleName != "KotlinToolchainV1Adapter") { // v1 is not producing some logs and that's expected
+                if (strategyConfig.first::class.simpleName != "KotlinToolchainsV1Adapter") { // v1 is not producing some logs and that's expected
                     assertLogContainsSubstringExactlyTimes(LogLevel.DEBUG, "AClass.java", 1) // no duplication of java sources
                 }
             }
