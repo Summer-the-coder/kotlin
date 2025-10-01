@@ -13,8 +13,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.KotlinToolingDiagnostics.TestApiDependencyWarning
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.kotlinToolingDiagnosticsCollector
 import org.jetbrains.kotlin.gradle.util.*
+import org.junit.Test
 import org.junit.jupiter.api.assertAll
-import kotlin.test.Test
 
 @OptIn(ExperimentalWasmDsl::class)
 class TestApiDependenciesCheckerTest {
@@ -102,6 +102,33 @@ class TestApiDependenciesCheckerTest {
     }
 
     @Test
+    fun `KMP - when dependencies are lazy providers, expect no warning`() {
+        val project = setupKmpProject {
+            kotlin {
+                sourceSets.apply {
+                    commonTest {
+                        dependencies {
+                            api(project.provider { "org.jetbrains.kotlinx:atomicfu:latest.release" })
+                        }
+                    }
+                    nativeTest {
+                        dependencies {
+                            api(project.provider { "org.jetbrains.kotlinx:kotlinx-serialization-json:latest.release" })
+                        }
+                    }
+                    jsTest {
+                        dependencies {
+                            api(project.provider { "org.jetbrains.kotlinx:kotlinx-html:latest.release" })
+                        }
+                    }
+                }
+            }
+        }
+
+        project.assertNoTestApiDependencyWarning()
+    }
+
+    @Test
     fun `KMP - when multiple test and main dependencies are defined as api, expect single warning, with aggregated dependencies`() {
         val project = setupKmpProject {
             kotlin {
@@ -162,6 +189,15 @@ class TestApiDependenciesCheckerTest {
     }
 
     @Test
+    fun `JVM - when project has api dependency - expect warning`() {
+        val project = buildProjectWithJvm {
+            dependencies.add("api", "org.jetbrains.kotlinx:atomicfu:latest.release")
+        }
+        project.evaluate()
+        project.assertNoTestApiDependencyWarning()
+    }
+
+    @Test
     fun `KMP - when project has java-test-fixtures, and testFixturesApi has dependency, expect no warning`() {
         val project = setupKmpProject(
             preApplyCode = {
@@ -175,9 +211,9 @@ class TestApiDependenciesCheckerTest {
     }
 
     @Test
-    fun `JVM - when project has api dependency - expect warning`() {
+    fun `JVM - when project has testApi dependency from lazy provider - expect no warning`() {
         val project = buildProjectWithJvm {
-            dependencies.add("api", "org.jetbrains.kotlinx:atomicfu:latest.release")
+            dependencies.add("testApi", project.provider { "org.jetbrains.kotlinx:atomicfu:latest.release" })
         }
         project.evaluate()
         project.assertNoTestApiDependencyWarning()

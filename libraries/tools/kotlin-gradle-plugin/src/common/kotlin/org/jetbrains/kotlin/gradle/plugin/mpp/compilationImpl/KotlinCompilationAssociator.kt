@@ -57,7 +57,7 @@ internal object DefaultKotlinCompilationAssociator : KotlinCompilationAssociator
 
         // Adding declared dependencies
         fun extend(aux: String, main: String) {
-            project.configurations.named(aux).configure { configuration ->
+            project.configurations.matching { it.name == aux }.configureEach { configuration ->
                 configuration.extendsFrom(project.configurations.getByName(main))
             }
         }

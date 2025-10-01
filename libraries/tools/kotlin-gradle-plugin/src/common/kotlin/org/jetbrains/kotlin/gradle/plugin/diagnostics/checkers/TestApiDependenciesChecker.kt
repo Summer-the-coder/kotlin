@@ -62,12 +62,14 @@ internal object TestApiDependenciesChecker : KotlinGradleProjectChecker {
             .filter { it.name == KotlinCompilation.TEST_COMPILATION_NAME }
 
         return testCompilations.map { compilation ->
-            val apiDependencies = compilation.allKotlinSourceSets.flatMap { sourceSet ->
+            val apiDependencies = mutableListOf<String>()
+            compilation.allKotlinSourceSets.forEach { sourceSet ->
                 project.configurations
                     .findByName(sourceSet.apiConfigurationName)
                     ?.dependencies
-                    .orEmpty()
-                    .map { it.stringCoordinates() }
+                    ?.configureEach { dependency ->
+                        apiDependencies += dependency.stringCoordinates()
+                    }
             }
             CompilationDependenciesPair(
                 compilation,
