@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-import org.jetbrains.kotlin.buildtools.api.KotlinToolchain
+import org.jetbrains.kotlin.buildtools.api.KotlinToolchains
 import org.jetbrains.kotlin.buildtools.api.SharedApiClassesClassLoader
 import org.jetbrains.kotlin.buildtools.api.tests.compilation.BaseCompilationTest
 import org.jetbrains.kotlin.buildtools.api.tests.compilation.assertions.assertOutputs
@@ -25,7 +25,7 @@ class DifferentCompilerVersionsTest : BaseCompilationTest() {
         val stdlibClasspath = System.getProperty("kotlin.build-tools-api.test.stdlibClasspath").split(File.pathSeparator)
             .map { Paths.get(it) }
         val compilerClassloader = URLClassLoader(compilerClasspath.toTypedArray(), SharedApiClassesClassLoader())
-        val toolchain = KotlinToolchain.loadImplementation(compilerClassloader)
+        val toolchain = KotlinToolchains.loadImplementation(compilerClassloader)
         project(toolchain, toolchain.createInProcessExecutionPolicy()) {
             val module1 = module("jvm-module-1", stdlibClasspath = stdlibClasspath)
             module1.compile { module ->
