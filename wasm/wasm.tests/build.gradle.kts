@@ -379,29 +379,20 @@ val createJscRunner by task<CreateJscRunner> {
 }
 
 fun Test.setupSpiderMonkey() {
-    inputs.files(unzipJsShell.map { it.outputs })
-        .withPathSensitivity(PathSensitivity.RELATIVE)
-        .withPropertyName("jsShellUnzipped")
-
-    val jsShellUnpackedDirectory = jsShellUnpackedDirectory.map {
-        it.resolve("js").absolutePath
-    }
+    val jsShellExecutablePath = unzipJsShell
+        .map { it.outputs.files.singleFile }
+        .map { it.resolve("js").absolutePath }
 
     jvmArgumentProviders += objects.newInstance<SystemPropertyClasspathProvider>().apply {
-        classpath.from(jsShellUnpackedDirectory)
+        classpath.from(jsShellExecutablePath)
         property.set("javascript.engine.path.SpiderMonkey")
     }
 }
 
 fun Test.setupWasmEdge() {
-    val wasmEdgeUnpackedDirectory = wasmEdgeUnpackedDirectory
-    inputs.files(unzipWasmEdge.map { it.outputs })
-        .withPathSensitivity(PathSensitivity.RELATIVE)
-        .withPropertyName("wasmEdgeUnzipped")
-
-    val wasmEdgeExecutablePath = wasmEdgeUnpackedDirectory.map {
-        it.resolve("bin/wasmedge").absolutePath
-    }
+    val wasmEdgeExecutablePath = unzipWasmEdge
+        .map { it.outputs.files.singleFile }
+        .map { it.resolve("bin/wasmedge").absolutePath }
 
     jvmArgumentProviders += objects.newInstance<SystemPropertyClasspathProvider>().apply {
         classpath.from(wasmEdgeExecutablePath)
@@ -410,14 +401,12 @@ fun Test.setupWasmEdge() {
 }
 
 fun Test.setupJsc() {
-    val jscRunner = createJscRunner.map { it.outputFile.get().asFile }
-    inputs.file(jscRunner)
-        .withPathSensitivity(PathSensitivity.RELATIVE)
-        .withPropertyName("jscRunner")
+    val jscRunnerExecutablePath = createJscRunner
+        .map { it.outputFile.asFile.get() }
+        .map { it.absolutePath }
 
-    val jscExecutablePath = jscRunner.map { it.absolutePath }
     jvmArgumentProviders += objects.newInstance<SystemPropertyClasspathProvider>().apply {
-        classpath.from(jscExecutablePath)
+        classpath.from(jscRunnerExecutablePath)
         property.set("javascript.engine.path.JavaScriptCore")
     }
 }
