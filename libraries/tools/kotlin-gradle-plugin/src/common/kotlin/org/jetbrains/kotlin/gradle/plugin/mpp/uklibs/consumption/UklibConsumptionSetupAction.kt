@@ -461,7 +461,7 @@ internal class SelectBestMatchingVariantForKmpResolutionUsage : AttributeDisambi
             }
         }
 
-        val isJvmOnlyComponent = details.candidateValues.contains(JAVA_API)
+        val isJvmOnlyComponent = details.candidateValues.map { it.name }.contains(JAVA_API)
         if (isJvmOnlyComponent) {
             when (consumerUsage) {
                 KOTLIN_UKLIB_API, KOTLIN_UKLIB_JAVA_API -> {
