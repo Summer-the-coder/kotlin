@@ -168,9 +168,10 @@ abstract class SyntheticAccessorGenerator<Context : LoweringContext, ScopeInfo>(
         }.also { accessor ->
             accessor.parent = parent
             accessor.copyAttributes(source)
-            accessor.copyTypeParameters(capturedTypeParameters(source), IrDeclarationOrigin.SYNTHETIC_ACCESSOR_CAPTURED_TYPE_PARAMETER)
+            val capturedTypeParameters = capturedTypeParameters(source)
+            accessor.copyTypeParameters(capturedTypeParameters, IrDeclarationOrigin.SYNTHETIC_ACCESSOR_CAPTURED_TYPE_PARAMETER)
             accessor.copyTypeParametersFrom(source, IrDeclarationOrigin.SYNTHETIC_ACCESSOR)
-            val typeParameterMapping = (capturedTypeParameters(source) + source.typeParameters).zip(accessor.typeParameters).toMap()
+            val typeParameterMapping = (capturedTypeParameters + source.typeParameters).zip(accessor.typeParameters).toMap()
             accessor.copyValueParametersToStatic(source, IrDeclarationOrigin.SYNTHETIC_ACCESSOR, dispatchReceiverType, typeParameterMapping)
             accessor.returnType = source.returnType.remapTypeParameters(source, accessor, typeParameterMapping)
 
