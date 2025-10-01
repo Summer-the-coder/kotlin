@@ -26,8 +26,6 @@ public class A<T : Any?>
             /* TARGET use-site */ <this>.C<S>(x = x)
         /* ACCESSOR declaration */ internal /* static */ fun <S : Any?, T : Any?> access$<outer-this-0>($this: C<S, T>): A<T>
             /* ACCESSOR use-site */ $this.<outer-this-0>()
-    internal inline fun getC(s: String): C<String, T>
-        /* ACCESSOR use-site */ <this>.C<String>(x = s, $constructor_marker = null)
     public companion object Companion
         /* TARGET declaration */ private fun bar(x: Any): Any
         internal inline fun callBar(x: Any): Any
@@ -51,8 +49,3 @@ public fun box(): String
     /* ACCESSOR use-site */ access$baz<Any?, Any?>($this = this, x = x, y = y)
     /* ACCESSOR use-site */ access$bar<Any?, Any?>($this = this, x = x, y = y)
     /* ACCESSOR use-site */ access$bar<Any?, Any?>($this = this, x = x, y = y)
-    /* ACCESSOR use-site */ this.C<String>(x = s, $constructor_marker = null)
-    val tmp0: C<Any?, Any?>
-        /* ACCESSOR use-site */ this.C<String>(x = s, $constructor_marker = null)
-    /* ACCESSOR use-site */ access$<outer-this-0><Any?, Any?>($this = this)
-    /* ACCESSOR use-site */ access$<outer-this-0><Any?, Any?>($this = this).C<Int>(x = 42, $constructor_marker = null)

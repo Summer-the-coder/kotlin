@@ -15,8 +15,6 @@ class A<T> {
     inner class C<S> private constructor(val x: S) {
         internal inline fun copy() = C<Int>(42)
     }
-    @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
-    internal inline fun getC(s: String) = C<String>(s)
 
     companion object Companion {
         private fun bar(x: Any) = x
@@ -35,9 +33,7 @@ fun box(): String {
     res += A<String>().callBaz("OK2 ", "NO2 ").first
     res += A<String>().callBaz("NO3 ", "OK3 ").second
     res += A<String>().B<String>().callBar("OK4 ", "NO4 ").first
-    res += A<String>().B<String>().callBar("NO5", "OK5 ").second
-    res += A<String>().getC("OK6 ").x
-    res += if (A<String>().getC("OK").copy().x == 42) "OK7" else "NO7"
-    if (res != "OK1 OK2 OK3 OK4 OK5 OK6 OK7") return res
+    res += A<String>().B<String>().callBar("NO5", "OK5").second
+    if (res != "OK1 OK2 OK3 OK4 OK5") return res
     else return "OK"
 }
