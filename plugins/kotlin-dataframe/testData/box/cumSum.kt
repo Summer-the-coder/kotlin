@@ -77,12 +77,12 @@ fun box(): String {
     val res12n = personsDfNullable.cumSum { weight }
     res12n.compareSchemas()
 
-    val max121n: DataColumn<Double> = res11n.weight
+    val max121n: DataColumn<Double> = res12n.weight
 
     val res12 = personsDf.cumSum { weight }
     res12.compareSchemas()
 
-    val max121: DataColumn<Double> = res21.weight
+    val max121: DataColumn<Double> = res12.weight
 
     // scenario #2: cumSum of values per columns separately
     val res3n = personsDfNullable.cumSum { weight and workExperienceYears and dependentsCount and annualIncome }
