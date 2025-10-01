@@ -287,11 +287,6 @@ private class SelectBestMatchingKotlinPlatformType : AttributeDisambiguationRule
         val matchingValue = details.candidateValues.singleOrNull { it == details.consumerValue }
         if (matchingValue != null) {
             details.closestMatch(matchingValue)
-        } else {
-            val jvmCandidate = details.candidateValues.singleOrNull { it == jvm }
-            if (jvmCandidate != null) {
-                details.closestMatch(jvmCandidate)
-            }
         }
     }
 }
@@ -448,7 +443,7 @@ internal class SelectBestMatchingVariantForKmpResolutionUsage : AttributeDisambi
             return@run
         }
 
-        val isRootKmpComponentWithJvm = details.candidateValues.map { it.name }.toSet().containsAll(listOf(JAVA_API, KOTLIN_METADATA))
+        val isRootKmpComponentWithJvm = details.candidateValues.map { it.name }.containsAll(listOf(JAVA_API, KOTLIN_METADATA))
         if (isRootKmpComponentWithJvm) {
             when (consumerUsage) {
                 KOTLIN_UKLIB_API, KOTLIN_UKLIB_RUNTIME -> {
@@ -466,7 +461,7 @@ internal class SelectBestMatchingVariantForKmpResolutionUsage : AttributeDisambi
             }
         }
 
-        val isJvmOnlyComponent = details.candidateValues.map { it.name }.toSet().containsAll(listOf(JAVA_API))
+        val isJvmOnlyComponent = details.candidateValues.contains(JAVA_API)
         if (isJvmOnlyComponent) {
             when (consumerUsage) {
                 KOTLIN_UKLIB_API, KOTLIN_UKLIB_JAVA_API -> {
