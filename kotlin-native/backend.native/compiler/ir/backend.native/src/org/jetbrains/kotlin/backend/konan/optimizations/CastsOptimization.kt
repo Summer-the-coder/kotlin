@@ -254,11 +254,13 @@ private object Predicates {
                         var disjunction = resultDisjunctions[i]
                         if (disjunction !== removedMarker && disjunction followsFrom currentDisjunction) {
                             resultDisjunctions[i] = removedMarker
+                            size -= disjunction.size
                             disjunction = removedMarker
                             ++removedCount
                         }
                         if (!replacedRemoved && disjunction === removedMarker) {
                             resultDisjunctions[i] = currentDisjunction
+                            size += currentDisjunction.size
                             --removedCount
                             replacedRemoved = true
                         }
@@ -266,9 +268,9 @@ private object Predicates {
                     if (!replacedRemoved) {
                         resultDisjunctions.add(currentDisjunction)
                         size += currentDisjunction.size
-                        if (size >= MaxSize)
-                            throw DivergingAnalysisError("Max size exceeded: $size")
                     }
+                    if (size >= MaxSize)
+                        throw DivergingAnalysisError("Max size exceeded: $size")
                 }
             }
 
